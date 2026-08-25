@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <ctime>
 #include <stdexcept>
+#include <algorithm>
 
 #include "logger.hpp"
 
@@ -17,6 +18,35 @@ const char *level_to_string(Level level)
     }
 
     return "UNKNOWN";
+}
+
+Level string_to_level(const std::string &level)
+{
+    if (!is_upper(level))
+    {
+        throw NotLevel(level);
+    }
+    if (level == "INFO")
+        return INFO;
+
+    if (level == "WARNING")
+        return WARNING;
+
+    if (level == "ERROR")
+        return ERROR;
+
+    throw UnknownLevel(level);
+}
+
+bool is_upper(const std::string &word)
+{
+    return std::all_of(
+        word.begin(),
+        word.end(),
+        [](unsigned char c)
+        {
+            return !std::isalpha(c) || std::isupper(c);
+        });
 }
 
 Message::Message(const std::string &text, Level level)

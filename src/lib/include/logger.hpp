@@ -13,7 +13,29 @@ enum Level
     ERROR
 
 };
+// переводы Уровень <=> строка
 const char *level_to_string(Level level);
+Level string_to_level(const std::string &level);
+// определение, является ли слово верхним регистром
+bool is_upper(const std::string &word);
+
+class NotLevel : public std::invalid_argument
+{
+public:
+    explicit NotLevel(const std::string &value)
+        : std::invalid_argument("Value is not a logging level: " + value)
+    {
+    }
+};
+
+class UnknownLevel : public std::invalid_argument
+{
+public:
+    explicit UnknownLevel(const std::string &value)
+        : std::invalid_argument("Unknown logging level: " + value)
+    {
+    }
+};
 
 // класс одного логирующего сообщения
 class Message
@@ -21,8 +43,9 @@ class Message
 public:
     Message(const std::string &text, Level level);
 
+    // перегрузка оператора вывода для Message
     friend std::ostream &operator<<(std::ostream &os, const Message &message);
-
+    // получить уровень важности сообщения
     Level get_level() const;
 
 private:
