@@ -1,7 +1,7 @@
 #include <iomanip>
 #include <ctime>
-#include <stdexcept>
 #include <algorithm>
+#include <cctype>
 
 #include "logger.hpp"
 
@@ -72,9 +72,9 @@ Level Message::get_level() const
     return level_;
 }
 
-Logger::Logger(const std::string &filename, Level default_level)
+Logger::Logger(const std::string &filename, Level default_level, std::ios::openmode mode)
     : default_level_(default_level),
-      logfile_(filename)
+      logfile_(filename, mode)
 {
     if (!logfile_.is_open())
     {

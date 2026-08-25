@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <filesystem>
 
 #include "logger.hpp"
 #include "app.hpp"
@@ -33,13 +34,37 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    std::ios::openmode mode = std::ios::app;
+    if (std::filesystem::exists(filename))
+    {
+        std::cout << "Log file \"" << filename << "\" already exists. Overwrite it? [y/n]: ";
+        while (true)
+        {
+            char answer;
+            std::cin >> answer;
+            if (answer == 'y' || answer == 'Y')
+            {
+                mode = std::ios::trunc;
+                break;
+            }
+            else if (answer == 'n' || answer == 'N')
+            {
+                break;
+            }
+            else
+            {
+                std::cerr << "Please enter y or n.\n";
+            }
+        }
+    }
+
     try
     {
-        Logger logger(filename, default_level);
+        Logger logger(filename, default_level, mode);
 
         MessageQueue queue;
 
-        std::thread input(input_thread, std::ref(queue), default_level);
+        std::thread input(input_thread, std::ref(queue), std::ref(logger));
         std::thread writer(write_thread, std::ref(queue), std::ref(logger));
 
         input.join();

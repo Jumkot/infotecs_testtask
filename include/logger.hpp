@@ -58,7 +58,7 @@ private:
 class Logger
 {
 public:
-    Logger(const std::string &filename, Level default_level);
+    Logger(const std::string &filename, Level default_level, std::ios::openmode mode);
 
     // изменить уровень важности сообщения по умолчанию
     void set_default_level(Level new_level);
