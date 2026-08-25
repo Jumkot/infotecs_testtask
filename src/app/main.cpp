@@ -62,9 +62,9 @@ int main(int argc, char *argv[])
     {
         Logger logger(filename, default_level, mode);
 
-        MessageQueue queue;
+        RequestQueue queue;
 
-        std::thread input(input_thread, std::ref(queue), std::ref(logger));
+        std::thread input(input_thread, std::ref(queue), default_level);
         std::thread writer(write_thread, std::ref(queue), std::ref(logger));
 
         input.join();

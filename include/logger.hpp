@@ -5,6 +5,7 @@
 #include <string>
 #include <chrono>
 #include <ostream>
+#include <stdexcept>
 
 enum Level
 {
@@ -19,6 +20,7 @@ Level string_to_level(const std::string &level);
 // определение, является ли слово верхним регистром
 bool is_upper(const std::string &word);
 
+// классы для различения ошибок в уровнях важности
 class NotLevel : public std::invalid_argument
 {
 public:
@@ -27,7 +29,6 @@ public:
     {
     }
 };
-
 class UnknownLevel : public std::invalid_argument
 {
 public:

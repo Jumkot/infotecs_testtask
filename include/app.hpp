@@ -9,15 +9,33 @@
 
 #include "logger.hpp"
 
-struct MessageQueue
+// запрос - либо лог-сообщение,
+// либо запрос на смену дефолт уровня
+class Request
 {
-    std::queue<Message> messages;      // очередь сообщений
-    std::mutex mutex;                  // мьютекс, защищающий очередь
-    std::condition_variable condition; // ожидание сообщений в очереди writer-потоком
-    bool finished = false;             // флаг окончания приёма сообщений
+public:
+    Request();
+
+    enum Type
+    {
+        MESSAGE,
+        SET_LEVEL
+    };
+
+    Type type_;
+    Message message_;
+    Level level_;
 };
 
-void input_thread(MessageQueue &queue, Level default_level);
-void write_thread(MessageQueue &queue, Logger &logger);
+struct RequestQueue
+{
+    std::queue<Request> requests;      // очередь запросов
+    std::mutex mutex;                  // мьютекс, защищающий очередь
+    std::condition_variable condition; // ожидание запросов в очереди writer-потоком
+    bool finished = false;             // флаг окончания приёма
+};
+
+void input_thread(RequestQueue &queue, Level default_level);
+void write_thread(RequestQueue &queue, Logger &logger);
 
 #endif

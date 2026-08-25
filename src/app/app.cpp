@@ -3,10 +3,16 @@
 #include "logger.hpp"
 #include "app.hpp"
 
-void input_thread(MessageQueue &queue, Level default_level)
+Request::Request()
+    : type_(Request::MESSAGE), message_("", INFO), level_(INFO)
+{
+}
+
+void input_thread(RequestQueue &queue, Level default_level)
 {
     std::cout << "Usage: <LOGGING LEVEL> <Logging message>\nor\n       "
-              << "<Logging message>\nor     <exit> to stop the app.\n";
+              << "<Logging message>\nor     <exit> to stop the app\n"
+              << "or     <LOGGING LEVEL> to set other level of importance.\n";
 
     std::string input;
     while (std::getline(std::cin, input))
@@ -21,28 +27,40 @@ void input_thread(MessageQueue &queue, Level default_level)
         std::string first_word;
         line >> first_word;
 
-        Level level;
+        Request req;
         try
         {
-            level = string_to_level(first_word);
-            std::getline(line >> std::ws, text);
-            if (text.empty())
-                continue;
+            req.level_ = string_to_level(first_word);
+            // пропуск пробела и проверка, что за ним (есть ли ещё слова)
+            if (line >> std::ws && line.peek() != EOF)
+            {
+                std::getline(line, text);
+            }
+            else
+            {
+                // если после уровня ничего нет - запрос на смену уровня
+                req.type_ = Request::SET_LEVEL;
+                default_level = req.level_;
+            }
         }
         catch (const NotLevel &)
         {
-            level = default_level;
+            req.level_ = default_level; // не указан уровень = по умолчанию
         }
         catch (const UnknownLevel &error)
         {
+            // вместо уровня капсом введено что-то, что уровнем не является
             std::cerr << "Input error: " << error.what() << '\n';
             continue;
         }
 
-        Message message(text, level);
+        if (req.type_ == Request::MESSAGE)
+        {
+            req.message_ = Message(text, req.level_);
+        }
         {
             std::lock_guard<std::mutex> lock(queue.mutex);
-            queue.messages.push(message);
+            queue.requests.push(req);
         }
         // будим writer после получения сообщения для записи
         queue.condition.notify_one();
@@ -55,7 +73,7 @@ void input_thread(MessageQueue &queue, Level default_level)
     queue.condition.notify_one();
 }
 
-void write_thread(MessageQueue &queue, Logger &logger)
+void write_thread(RequestQueue &queue, Logger &logger)
 {
     while (true)
     {
@@ -64,21 +82,29 @@ void write_thread(MessageQueue &queue, Logger &logger)
 
         queue.condition.wait(lock,
                              [&queue]()
-                             { return !queue.messages.empty() || queue.finished; });
+                             { return !queue.requests.empty() || queue.finished; });
 
         // завершаем, только когда сообщений уже не будет И очередь уже пуста
-        if (queue.messages.empty() && queue.finished)
+        if (queue.requests.empty() && queue.finished)
             break;
 
-        Message message = queue.messages.front();
-        queue.messages.pop();
+        Request request = queue.requests.front();
+        queue.requests.pop();
 
         lock.unlock();
         // запись ведётся без блока мьютекса, чтобы input мог
         // пополнять очередь во время записи writer-ом в файл
         try
         {
-            logger.log(message);
+            if (request.type_ == Request::MESSAGE)
+            {
+                logger.log(request.message_);
+            }
+            else if (request.type_ == Request::SET_LEVEL)
+            {
+                logger.set_default_level(request.level_);
+                std::cout << "Logging level was changed to " << level_to_string(request.level_) << std::endl;
+            }
         }
         catch (const std::runtime_error &error)
         {
