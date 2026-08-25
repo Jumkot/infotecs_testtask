@@ -37,6 +37,11 @@ std::ostream &operator<<(std::ostream &stream, const Message &message)
     return stream;
 }
 
+Level Message::get_level() const
+{
+    return level_;
+}
+
 Logger::Logger(const std::string &filename, Level default_level)
     : default_level_(default_level),
       logfile_(filename)
@@ -52,6 +57,11 @@ void Logger::set_default_level(Level new_level)
     default_level_ = new_level;
 }
 
+Level Logger::get_default_level() const
+{
+    return default_level_;
+}
+
 bool Logger::is_important(Level level) const
 {
     return (level >= default_level_);
@@ -60,19 +70,22 @@ bool Logger::is_important(Level level) const
 // обработка сообщения без заданного уровня важности
 void Logger::log(const std::string &message)
 {
-    log(message, default_level_);
+    log(Message(message, default_level_));
 }
 
 void Logger::log(const std::string &message, Level level)
 {
-    if (!is_important(level))
+    log(Message(message, level));
+}
+
+void Logger::log(const Message &message)
+{
+    if (!is_important(message.get_level()))
     {
         return;
     }
 
-    Message msg(message, level);
-
-    logfile_ << msg << std::endl;
+    logfile_ << message << std::endl;
 
     if (!logfile_)
     {

@@ -11,6 +11,9 @@ TARGET := $(BIN_DIR)/app
 
 LIB := $(BIN_DIR)/liblogger.so
 
+FILE ?= demo.log
+LEVEL ?= WARNING
+
 all: $(TARGET)
 
 $(TARGET): $(OBJ) $(LIB)
@@ -21,8 +24,11 @@ $(OBJ): $(SRC)
 	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -I../lib/include -c $< -o $@
 
+$(LIB):
+	$(MAKE) -C ../lib
+
 run: $(TARGET)
-	@LD_LIBRARY_PATH=../../build/bin ./$(TARGET)
+	@LD_LIBRARY_PATH=$(BIN_DIR) ./$(TARGET) $(FILE) $(LEVEL)
 
 clean:
 	rm -rf $(OBJ_DIR) $(TARGET)

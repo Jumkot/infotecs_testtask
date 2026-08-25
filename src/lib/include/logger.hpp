@@ -23,6 +23,8 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Message &message);
 
+    Level get_level() const;
+
 private:
     Level level_;
     std::chrono::system_clock::time_point timestamp_;
@@ -37,9 +39,13 @@ public:
 
     // изменить уровень важности сообщения по умолчанию
     void set_default_level(Level new_level);
+    // пролучить уровень важности сообщения по умолчанию
+    Level get_default_level() const;
+
     // внесение записи в журнал (с уровнем важности или без)
     void log(const std::string &message);
     void log(const std::string &message, Level level);
+    void log(const Message &message);
 
 private:
     Level default_level_;
