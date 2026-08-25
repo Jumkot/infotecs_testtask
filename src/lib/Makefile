@@ -16,7 +16,7 @@ $(TARGET): $(OBJ)
 
 $(OBJ): $(SRC)
 	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I../../include -c $< -o $@
 
 clean:
 	rm -rf $(OBJ_DIR) $(TARGET)

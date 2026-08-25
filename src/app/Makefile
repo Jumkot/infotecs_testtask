@@ -3,16 +3,13 @@ CXXFLAGS := -std=c++17 -O2 -Wall -Wextra -pthread
 LDFLAGS := -L../../build/bin
 LDLIBS := -llogger -pthread
 
-SRC := app.cpp
+SRC := app.cpp main.cpp
 OBJ_DIR := ../../build/obj
 BIN_DIR := ../../build/bin
-OBJ := $(OBJ_DIR)/app.o
+OBJ := $(OBJ_DIR)/app.o $(OBJ_DIR)/main.o
 TARGET := $(BIN_DIR)/app
 
 LIB := $(BIN_DIR)/liblogger.so
-
-FILE ?= demo.log
-LEVEL ?= WARNING
 
 all: $(TARGET)
 
@@ -20,9 +17,9 @@ $(TARGET): $(OBJ) $(LIB)
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
-$(OBJ): $(SRC)
+$(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -I../lib/include -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I../../include -c $< -o $@
 
 $(LIB):
 	$(MAKE) -C ../lib

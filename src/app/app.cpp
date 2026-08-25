@@ -5,8 +5,8 @@
 
 void input_thread(MessageQueue &queue, Level default_level)
 {
-    std::cout << "Usage: <LOGGING LEVEL> <Logging message>\nor\n\t"
-              << "<Logging message>\nor\nType <exit> to stop the app.\n";
+    std::cout << "Usage: <LOGGING LEVEL> <Logging message>\nor\n       "
+              << "<Logging message>\nor     <exit> to stop the app.\n";
 
     std::string input;
     while (std::getline(std::cin, input))

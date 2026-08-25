@@ -20,7 +20,7 @@ $(TARGET): $(OBJ) $(LIB)
 
 $(OBJ): $(SRC)
 	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -I../src/lib/include -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I../include -c $< -o $@
 
 $(LIB):
 	$(MAKE) -C ../src/lib
