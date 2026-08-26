@@ -38,7 +38,7 @@ void input_thread(RequestQueue &queue, Level default_level)
             }
             else
             {
-                // если после уровня ничего нет - запрос на смену уровня
+                // если после уровня ничего нет - это запрос на смену уровня
                 req.type_ = Request::SET_LEVEL;
                 default_level = req.level_;
             }

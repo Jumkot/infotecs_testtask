@@ -45,6 +45,7 @@ private:
     std::string path_;
 };
 
+// форматированный вывод результатов теста
 void show_test_result(int number, bool passed, const char *name)
 {
     if (passed)
@@ -63,7 +64,7 @@ void show_test_result(int number, bool passed, const char *name)
 bool test_level_filtering()
 {
     TestFile test_file(TEST_LOG);
-    Logger logger(TEST_LOG, WARNING);
+    Logger logger(TEST_LOG, WARNING, std::ios::trunc);
 
     logger.log("This message must not be logged", INFO);
     logger.log("Warning message", WARNING);
@@ -92,7 +93,7 @@ bool test_level_filtering()
 bool test_default_level()
 {
     TestFile test_file(TEST_LOG);
-    Logger logger(TEST_LOG, WARNING);
+    Logger logger(TEST_LOG, WARNING, std::ios::trunc);
 
     logger.log("Default level message");
 
@@ -115,7 +116,7 @@ bool test_default_level()
 bool test_set_default_level()
 {
     TestFile test_file(TEST_LOG);
-    Logger logger(TEST_LOG, ERROR);
+    Logger logger(TEST_LOG, ERROR, std::ios::trunc);
 
     logger.log("This must not be logged", WARNING);
 
@@ -145,7 +146,7 @@ bool test_invalid_file()
 
     try
     {
-        Logger logger("/nonexistent_directory/logger.log", INFO);
+        Logger logger("/nonexistent_directory/logger.log", INFO, std::ios::trunc);
     }
     catch (const std::runtime_error &)
     {
@@ -162,7 +163,7 @@ bool test_write_error()
 
     try
     {
-        Logger logger("/dev/full", INFO);
+        Logger logger("/dev/full", INFO, std::ios::trunc);
         logger.log("This write must fail");
     }
     catch (const std::runtime_error &)

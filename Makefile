@@ -3,6 +3,7 @@ LIB_DIR := $(SRC_DIR)/lib
 APP_DIR := $(SRC_DIR)/app
 TEST_DIR := test
 
+## опции по умолчанию для быстрой демонстрации
 FILE ?= demo.log
 LEVEL ?= WARNING
 

@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // выбор, перезаписывать ли уже существующий лог-файл с таким же именем, или продолжить его
     std::ios::openmode mode = std::ios::app;
     if (std::filesystem::exists(filename))
     {
@@ -68,7 +69,7 @@ int main(int argc, char *argv[])
         std::thread writer(write_thread, std::ref(queue), std::ref(logger));
 
         input.join();
-        writer.join();
+        writer.join(); // присоединяется вторым ,чтобы доработать очередь, если она не пуста
     }
     catch (const std::runtime_error &error)
     {
