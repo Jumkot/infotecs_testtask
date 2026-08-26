@@ -25,7 +25,7 @@
     } while (false)
 
 const std::string TEST_LOG = "logger_test.log";
-const int TEST_N = 5;
+const int TEST_N = 7;
 
 // управляет файлом вывода теста
 class TestFile
@@ -174,6 +174,50 @@ bool test_write_error()
     return exception_thrown;
 }
 
+// преобразование строки в уровень важности
+bool test_string_to_level()
+{
+    CHECK(string_to_level("INFO") == INFO);
+    CHECK(string_to_level("WARNING") == WARNING);
+    CHECK(string_to_level("ERROR") == ERROR);
+
+    bool not_level_thrown = false;
+    try
+    {
+        string_to_level("Info");
+    }
+    catch (const NotLevel &)
+    {
+        not_level_thrown = true;
+    }
+    CHECK(not_level_thrown);
+
+    bool unknown_level_thrown = false;
+    try
+    {
+        string_to_level("DEBUG");
+    }
+    catch (const UnknownLevel &)
+    {
+        unknown_level_thrown = true;
+    }
+    CHECK(unknown_level_thrown);
+
+    return true;
+}
+
+// преобразование уровня важности в строку
+bool test_level_to_string()
+{
+    CHECK(std::string(level_to_string(INFO)) == "INFO");
+    CHECK(std::string(level_to_string(WARNING)) == "WARNING");
+    CHECK(std::string(level_to_string(ERROR)) == "ERROR");
+
+    CHECK(std::string(level_to_string(static_cast<Level>(100))) == "UNKNOWN");
+
+    return true;
+}
+
 void test_all()
 {
     bool passed = true;
@@ -184,6 +228,8 @@ void test_all()
     RUN_TEST(3, test_set_default_level);
     RUN_TEST(4, test_invalid_file);
     RUN_TEST(5, test_write_error);
+    RUN_TEST(6, test_string_to_level);
+    RUN_TEST(7, test_level_to_string);
 
     std::cout << '\n';
     if (passed)
